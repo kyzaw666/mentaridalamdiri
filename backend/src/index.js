@@ -21,9 +21,11 @@ app.use(express.urlencoded({ limit: '500kb', extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" 
-      ? process.env.FRONTEND_URL 
-      : "http://localhost:5173",
+    origin: [
+      "https://mentaridalamdiri.vercel.app",
+      "https://mentaridalamdiri-4z8dp4060-kyzaww666s-projects.vercel.app",
+      process.env.NODE_ENV === "development" ? "http://localhost:5173" : ""
+    ].filter(Boolean),
     credentials: true,
   })
 );
