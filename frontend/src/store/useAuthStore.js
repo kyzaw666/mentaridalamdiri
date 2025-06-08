@@ -3,7 +3,8 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5001";
+const BASE_URL = import.meta.env.VITE_API_URL;
+const SOCKET_URL = BASE_URL.startsWith('http') ? BASE_URL : `https://${BASE_URL}`;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -95,24 +96,31 @@ export const useAuthStore = create((set, get) => ({
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
 
-    const socket = io(BASE_URL, {
+    console.log("Connecting to socket at:", SOCKET_URL);
+    
+    const socket = io(SOCKET_URL, {
       query: {
         userId: authUser._id,
       },
       withCredentials: true,
       transports: ['websocket', 'polling'],
     });
+    
     socket.connect();
 
-    set({ socket: socket });
-
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
+    socket.on("connect", () => {
+      console.log("Socket connected successfully");
     });
 
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
       toast.error("Failed to connect to chat server");
+    });
+
+    set({ socket: socket });
+
+    socket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
     });
   },
   disconnectSocket: () => {

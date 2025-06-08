@@ -23,10 +23,12 @@ app.use(
   cors({
     origin: [
       "https://mentaridalamdiri.vercel.app",
-      "https://mentaridalamdiri-4z8dp4060-kyzaww666s-projects.vercel.app",
+      "https://mentaridalamdiri-ginnsy2hs-kyzaww666s-projects.vercel.app",
       process.env.NODE_ENV === "development" ? "http://localhost:5173" : ""
     ].filter(Boolean),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
   })
 );
 

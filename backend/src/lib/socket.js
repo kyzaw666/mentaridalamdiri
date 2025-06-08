@@ -7,7 +7,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [
+      "https://mentaridalamdiri.vercel.app",
+      "https://mentaridalamdiri-m5rco2t28-kyzaww666s-projects.vercel.app",
+      process.env.NODE_ENV === "development" ? "http://localhost:5173" : ""
+    ].filter(Boolean),
+    credentials: true,
   },
 });
 
