@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5001";
 const SOCKET_URL = BASE_URL.startsWith('http') ? BASE_URL : `https://${BASE_URL}`;
 
 export const useAuthStore = create((set, get) => ({
@@ -18,12 +18,14 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
-      set({ authUser: null });
+      if (error.response?.status === 401) {
+        set({ authUser: null });
+        get().disconnectSocket();
+      }
     } finally {
       set({ isCheckingAuth: false });
     }

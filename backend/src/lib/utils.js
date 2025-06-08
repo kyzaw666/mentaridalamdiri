@@ -5,14 +5,19 @@ export const generateToken = (userId, res) => {
     expiresIn: "7d",
   });
 
-  res.cookie("jwt", token, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // MS
-    httpOnly: true, // prevent XSS attacks cross-site scripting attacks
-    sameSite: "none", // Required for cross-domain cookies
-    secure: true, // Required for sameSite: "none"
-    domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined, // Allow subdomains in production
-    path: "/", // Ensure cookie is available everywhere
-  });
+  const cookieOptions = {
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+  };
 
+  // Only set domain in production
+  if (process.env.NODE_ENV === "production") {
+    cookieOptions.domain = ".railway.app";
+  }
+
+  res.cookie("jwt", token, cookieOptions);
   return token;
 };
